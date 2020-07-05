@@ -1,23 +1,6 @@
-### zfplugs is plugins for the zfcore framework
-https://github.com/zendbit/nim.zfcore
+### extend stdlib if nim lang
 
 #### install
 ```
-nimble install zfplugs
+nimble install https://github.com/zendbit/nim.stdext
 ```
-
-#### usage
-available plugins
-```
-zfplugs/auth
-zfplugs/csrf
-zfplugs/dbs
-zfplugs/mysql
-zfplugs/paging
-zfplugs/pgsql
-zfplugs/settings
-zfplugs/sqlite
-```
-
-this project still in heavy development and testing, the documentation will be added after we make sure all plugins running well in production
-/Volumes/Data/Users/amru/Documents/Code/Nim/zendflow/.nimdeps/zendbit/nim.zfcore/src/zfmacros.nim nim.stdext
