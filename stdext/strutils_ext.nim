@@ -8,7 +8,7 @@
 ]#
 
 import
-  std/strutils
+  strutils
 
 from parseutils import parseBiggestFloat
 
@@ -202,4 +202,3 @@ proc tryParseEnum*[T](str: string, default: T): tuple[ok: bool, val: T] =
 
   except:
     result = (false, default)
-
