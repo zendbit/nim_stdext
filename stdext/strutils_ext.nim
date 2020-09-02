@@ -190,7 +190,7 @@ proc tryParseBool*(str: string, default: bool = false): tuple[ok: bool, val: boo
 proc tryParseEnum*[T](str: string, default: T): tuple[ok: bool, val: T] =
   #
   # parse string 
-  # let parse = "12".tryParseBinInt(MyEnum.White)
+  # let parse = "12".tryParseEnum(MyEnum.White)
   # if parse.ok:
   #   echo parse.val
   # 
