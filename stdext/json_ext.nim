@@ -1,59 +1,58 @@
 import json, options
+import options_ext
 export json
 
 type
   FieldDesc* = tuple[name: string, nodeKind: JsonNodeKind]
-  FieldAlias* = tuple[name: string, alias: string]
 
 proc `%`*(fieldDesc: FieldDesc): JsonNode =
+ 
   return %*{"name": fieldDesc.name, "nodeKind": fieldDesc.nodeKind}
 
-proc `%`*(fieldAlias: FieldAlias): JsonNode =
-  return %*{"name": fieldAlias.name, "nodeKind": fieldAlias.alias}
-
-proc nodeAlias(jnode: JsonNode, fieldAlias: openArray[FieldAlias]) =
-  # change the key as alias
-  for (name, alias) in fieldAlias:
-    let aliasElm = jnode{name}
-    if not aliasElm.isNil:
-      jnode.delete(name)
-      jnode[alias] = aliasElm
-
-proc toObj*[T](
-  j: JsonNode,
-  t: typedesc[T],
-  fieldAlias: openArray[FieldAlias] = []): T =
-  ##
-  ## convert JsonNode to obj
-  ##
-  let tmp = %t()
-  for k, v in j:
-    var keyName = k
-    var val = v
-    for (name, alias) in fieldAlias:
-      if k == name:
-        keyName = alias
-        break
-    if val.kind == JNull:
-      val = tmp{keyName}
-    if tmp.contains(keyName):
-      tmp[keyName] = val
-
-  result = tmp.to(t)
-
 proc fieldsDesc*(j: JsonNode): seq[FieldDesc] =
+
   result = @[]
   for k, v in j:
     result.add((k, v.kind))
 
-#proc fieldsDesc*[T: object](obj: T): seq[FieldDesc] =
-#  for k, v in obj.fieldPairs:
-#    if v is Option:
-#      result.add((k, (%v.getOrDefault).kind))
-#    else:
-#      result.add((k, (%v).kind))
+proc fieldsDesc*[T](obj: T): seq[FieldDesc] =
+  for k, v in obj.fieldPairs:
+    let vtype = cast[type v](v)
+    if vtype is Option:
+      if vtype is Option[SomeInteger]:
+        result.add((k, JInt))
+      elif vtype is Option[SomeFloat]:
+        result.add((k, JFloat))
+      elif vtype is Option[string]:
+        result.add((k, JString))
+      elif vtype is Option[bool]:
+        result.add((k, JBool))
+      elif vtype is Option[array] or vType is Option[seq]:
+        result.add((k, JArray))
+      elif vtype is Option[RootObj]:
+        result.add((k, JObject))
+      else:
+        result.add((k, JNull))
+    else:
+      if v is SomeInteger:
+        result.add((k, JInt))
+      elif v is SomeFloat:
+        result.add((k, JFloat))
+      elif v is string:
+        result.add((k, JString))
+      elif v is bool:
+        result.add((k, JBool))
+      elif v is array or v is seq:
+        result.add((k, JArray))
+      elif v is RootObj:
+        result.add((k, JObject))
+      else:
+        result.add((k, JNull))
 
-proc filter*(j: JsonNode, p: proc (x: JsonNode): bool): JsonNode =
+proc filter*(
+  j: JsonNode,
+  p: proc (x: JsonNode): bool): JsonNode =
+
   case j.kind
   of JObject:
     result = newJObject()
@@ -69,45 +68,27 @@ proc filter*(j: JsonNode, p: proc (x: JsonNode): bool): JsonNode =
     raise newException(ValueError, "invalid parameter should be JObject or JArray")
 
 proc discardNull*(j: JsonNode): JsonNode =
-  result = j.filter(proc (x: JsonNode): bool = x.kind == JArray)
+  return j.filter(proc (x: JsonNode): bool = x.kind != JNull)
 
-proc toJson*[T](
-  obj: T,
-  fieldsAlias: openArray[FieldAlias] = [],
-  defaultNull: bool = true,
-  discardNull: bool = false,
-  excludes: openArray[string] = []): JsonNode =
-  result = %*{}
-  let tmp = %obj
-  for k, v in tmp:
-    if k in excludes:
-      continue
-    var val = v
-    if defaultNull:
-      case v.kind
-      of JString:
-        if v.getStr == "":
-          val = newJNull()
-      of JInt:
-        if v.getBiggestInt == 0:
-          val = newJNull()
-      of JFloat:
-        if v.getFloat == 0.0:
-          val = newJNull()
-      of JBool:
-        if v.getBool:
-          val = newJNull()
-      else:
-        discard
+proc map*(
+  j: JsonNode,
+  p: proc (x: JsonNode): JsonNode): JsonNode =
 
-    if discardNull and val.kind == JNull:
-      continue
-    
-    result[k] = val
+  case j.kind
+  of JObject:
+    result = newJObject()
+    for k, v in j:
+      result[k] = p(v)
+  of JArray:
+    result = newJArray()
+    for v in j:
+      result.add(p(v))
+  else:
+    raise newException(ValueError, "invalid parameter should be JObject or JArray")
 
-  result.nodeAlias(fieldsAlias)
-
-proc delete*(node: JsonNode, keys: openArray[string]): JsonNode =
+proc delete*(
+  node: JsonNode,
+  keys: openArray[string]): JsonNode =
   result = node
   for k in keys:
     result.delete(k)

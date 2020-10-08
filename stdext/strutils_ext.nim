@@ -10,7 +10,10 @@ import
 
 from parseutils import parseBiggestFloat
 
-proc tryParseInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
+proc tryParseInt*(
+  str: string,
+  default: int = 0): tuple[ok: bool, val: int] =
+
   #
   # parse string 
   # let parse = "12".tryParseInt(-1)
@@ -26,7 +29,10 @@ proc tryParseInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
   except:
     result = (false, default)
 
-proc tryParseUInt*(str: string, default: uint = 0): tuple[ok: bool, val: uint] =
+proc tryParseUInt*(
+  str: string,
+  default: uint = 0): tuple[ok: bool, val: uint] =
+
   #
   # parse string 
   # let parse = "12".tryParseUInt(-1)
@@ -42,7 +48,10 @@ proc tryParseUInt*(str: string, default: uint = 0): tuple[ok: bool, val: uint] =
   except:
     result = (false, default)
 
-proc tryParseBiggestInt*(str: string, default: int64 = 0): tuple[ok: bool, val: int64] =
+proc tryParseBiggestInt*(
+  str: string,
+  default: int64 = 0): tuple[ok: bool, val: int64] =
+
   #
   # parse string 
   # let parse = "12".tryParseBiggestInt(-1)
@@ -58,7 +67,9 @@ proc tryParseBiggestInt*(str: string, default: int64 = 0): tuple[ok: bool, val: 
   except:
     result = (false, default)
 
-proc tryParseBiggestUInt*(str: string, default: uint64 = 0): tuple[ok: bool, val: uint64] =
+proc tryParseBiggestUInt*(
+  str: string,
+  default: uint64 = 0): tuple[ok: bool, val: uint64] =
   #
   # parse string 
   # let parse = "12".tryParseBiggestUInt(-1)
@@ -74,7 +85,9 @@ proc tryParseBiggestUInt*(str: string, default: uint64 = 0): tuple[ok: bool, val
   except:
     result = (false, default)
 
-proc tryParseFloat*(str: string, default: float = 0f): tuple[ok: bool, val: float] =
+proc tryParseFloat*(
+  str: string,
+  default: float = 0f): tuple[ok: bool, val: float] =
   #
   # parse string 
   # let parse = "12".tryParseFloat(-1f)
@@ -90,7 +103,9 @@ proc tryParseFloat*(str: string, default: float = 0f): tuple[ok: bool, val: floa
   except:
     result = (false, default)
 
-proc tryParseBiggestFloat*(str: string, default: float64 = 0f): tuple[ok: bool, val: float64] =
+proc tryParseBiggestFloat*(
+  str: string,
+  default: float64 = 0f): tuple[ok: bool, val: float64] =
   #
   # parse string 
   # let parse = "12".tryParseBiggestFloat(-1f)
@@ -107,7 +122,9 @@ proc tryParseBiggestFloat*(str: string, default: float64 = 0f): tuple[ok: bool, 
   else:
     result = (false, default)
 
-proc tryParseBinInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
+proc tryParseBinInt*(
+  str: string,
+  default: int = 0): tuple[ok: bool, val: int] =
   #
   # parse string 
   # let parse = "12".tryParseBinInt(-1)
@@ -123,7 +140,9 @@ proc tryParseBinInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
   except:
     result = (false, default)
 
-proc tryParseOctInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
+proc tryParseOctInt*(
+  str: string,
+  default: int = 0): tuple[ok: bool, val: int] =
   #
   # parse string 
   # let parse = "12".tryParseOctInt(-1)
@@ -139,7 +158,9 @@ proc tryParseOctInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
   except:
     result = (false, default)
 
-proc tryParseHexInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
+proc tryParseHexInt*(
+  str: string,
+  default: int = 0): tuple[ok: bool, val: int] =
   #
   # parse string 
   # let parse = "12".tryParseHexInt(-1)
@@ -155,7 +176,9 @@ proc tryParseHexInt*(str: string, default: int = 0): tuple[ok: bool, val: int] =
   except:
     result = (false, default)
 
-proc tryParseHexStr*(str: string, default: string = "0"): tuple[ok: bool, val: string] =
+proc tryParseHexStr*(
+  str: string,
+  default: string = "0"): tuple[ok: bool, val: string] =
   #
   # parse string 
   # let parse = "12".tryParseHexStr("A")
@@ -171,7 +194,9 @@ proc tryParseHexStr*(str: string, default: string = "0"): tuple[ok: bool, val: s
   except:
     result = (false, default)
 
-proc tryParseBool*(str: string, default: bool = false): tuple[ok: bool, val: bool] =
+proc tryParseBool*(
+  str: string,
+  default: bool = false): tuple[ok: bool, val: bool] =
   #
   # parse string 
   # let parse = "12".tryParseBool(true)
@@ -187,7 +212,9 @@ proc tryParseBool*(str: string, default: bool = false): tuple[ok: bool, val: boo
   except:
     result = (false, default)
 
-proc tryParseEnum*[T](str: string, default: T): tuple[ok: bool, val: T] =
+proc tryParseEnum*[T](
+  str: string,
+  default: T): tuple[ok: bool, val: T] =
   #
   # parse string 
   # let parse = "12".tryParseEnum(MyEnum.White)
