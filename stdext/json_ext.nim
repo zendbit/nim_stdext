@@ -15,6 +15,10 @@ proc fieldsDesc*(j: JsonNode): seq[FieldDesc] =
   for k, v in j:
     result.add((k, v.kind))
 
+proc names*(fieldsDesc: seq[FieldDesc]): seq[string] =
+  for f in fieldsDesc:
+    result.add(f.name)
+
 proc fieldsDesc*[T](obj: T): seq[FieldDesc] =
   for k, v in obj.fieldPairs:
     let vtype = cast[type v](v)
