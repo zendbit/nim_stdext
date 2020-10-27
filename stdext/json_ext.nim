@@ -26,6 +26,10 @@ proc names*(fieldsDesc: seq[FieldDesc]): seq[string] =
   for f in fieldsDesc:
     result.add(f.name)
 
+proc values*(fieldsItem: seq[FieldItem]): seq[string] =
+  for f in fieldsItem:
+    result.add(f.val)
+
 proc fieldsDesc*[T](obj: T): seq[FieldDesc] =
   for k, v in obj.fieldPairs:
     let vtype = cast[type v](v)
