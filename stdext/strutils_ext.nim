@@ -6,7 +6,9 @@
 ]#
 
 import
-  strutils
+  strutils,
+  nre,
+  strformat
 
 from parseutils import parseBiggestFloat
 
@@ -227,3 +229,9 @@ proc tryParseEnum*[T](
 
   except:
     result = (false, default)
+
+proc toCamelcase*(s: string): string =
+  return s.replace(re "_([a-z])", proc (s: string): string = s.toUpper).replace("_", "")
+
+proc toSnakeCase*(s: string): string =
+  s.replace(re "[A-Z]", proc (s: string): string = &"_{s.toLower}")
