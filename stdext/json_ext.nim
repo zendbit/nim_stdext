@@ -9,7 +9,7 @@ type
 
 proc `%`*(fieldDesc: FieldDesc): JsonNode =
  
-  return %*{"name": fieldDesc.name, "nodeKind": fieldDesc.nodeKind}
+  result = %*{"name": fieldDesc.name, "nodeKind": fieldDesc.nodeKind}
 
 proc fieldsDesc*(j: JsonNode): seq[FieldDesc] =
 

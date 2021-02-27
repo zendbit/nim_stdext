@@ -14,5 +14,5 @@ proc xorEncodeDecode*(
   for i in 0..<data.len:
     decodedData &= chr(data[i].uint8 xor key[i mod 4].uint8)
 
-  return decodedData
+  result = decodedData
 

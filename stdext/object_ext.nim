@@ -6,5 +6,5 @@ proc patch*[T: object | ref object](self: T, patch: T): T =
     if tmp.hasKey(k) and v.kind != JNull:
       tmp[k] = v
 
-  return tmp.to(T)
+  result = tmp.to(T)
 
