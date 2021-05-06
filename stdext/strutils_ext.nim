@@ -1,9 +1,9 @@
-#[
-  License: BSD
-  Author: Amru Rosyada
-  Email: amru.rosyada@gmail.com
-  Git: https://github.com/zendbit 
-]#
+##
+##  License: BSD
+##  Author: Amru Rosyada
+##  Email: amru.rosyada@gmail.com
+##  Git: https://github.com/zendbit/nim.stdext
+##
 
 import
   strutils,
