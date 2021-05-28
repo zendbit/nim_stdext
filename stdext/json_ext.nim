@@ -103,7 +103,7 @@ proc fieldDesc*[T](k: string, v: T): JFieldDesc =
 
     result = (k, valNodeKind)
 
-proc fieldDescs*[T: object|ref object](obj: T): seq[JFieldDesc] =
+proc fieldDesc*[T: object|ref object](obj: T): seq[JFieldDesc] =
   when obj is object:
     for k, v in obj.fieldPairs:
       if not v.hasCustomPragma(ignoreField):
@@ -168,7 +168,7 @@ proc fieldPair*[T](k: string, v: T): JFieldPair =
 
     result = (k, valStr, valNodeKind)
 
-proc fieldPairs*[T: object|ref object](obj: T): seq[JFieldPair] =
+proc fieldPair*[T: object|ref object](obj: T): seq[JFieldPair] =
   when obj is object:
     for k, v in obj.fieldPairs:
       if not v.hasCustomPragma(ignoreField):
@@ -233,7 +233,7 @@ proc fieldItem*[T](v: T): JFieldItem =
 
     result = (valStr, valNodeKind)
 
-proc fieldItems*[T: object|ref object](obj: T): seq[JFieldItem] =
+proc fieldItem*[T: object|ref object](obj: T): seq[JFieldItem] =
   when obj is object:
     for k, v in obj.fieldPairs:
       if not v.hasCustomPragma(ignoreField):
