@@ -271,26 +271,9 @@ proc discardNull*(j: JsonNode): JsonNode =
   else:
     raise newException(ValueError, "invalid parameter should be JObject or JArray")
 
-proc map*(
-  j: JsonNode,
-  p: proc (x: JsonNode): JsonNode): JsonNode =
-
-  case j.kind
-  of JObject:
-    result = newJObject()
-    for k, v in j:
-      result[k] = p(%*{"key": k, "val": v})
-  of JArray:
-    result = newJArray()
-    for v in j:
-      result.add(p(v))
-  else:
-    raise newException(ValueError, "invalid parameter should be JObject or JArray")
-
 proc delete*(
-  node: JsonNode,
-  keys: varargs[string]): JsonNode =
-  result = node
+  node: var JsonNode,
+  keys: varargs[string]) =
   for k in keys:
-    result.delete(k)
+    node.delete(k)
 
