@@ -7,8 +7,8 @@
 
 import json, options, times, macros, strutils
 export json, options, times
-import options_ext
-export options_ext
+import options_ext, strutils_ext
+export options_ext, strutils_ext
 
 # ignore field on fieldsItem, fieldsDesc, fieldsPair
 template ignoreField*() {.pragma.}
@@ -41,6 +41,25 @@ proc `%`*(fieldItem: JFieldItem): JsonNode =
 proc `%`*(fieldPair: JFieldPair): JsonNode =
  
   result = %*{"name": fieldPair.name, "val": fieldPair.val, "nodeKind": fieldPair.nodeKind}
+
+proc jValue*(fieldPair: JFieldPair|JFieldItem): JsonNode =
+  case fieldPair.nodeKind
+  of JString:
+    result = newJString(fieldPair.val)
+  of JInt:
+    result = newJInt(fieldPair.val.tryParseBiggestInt(0).val)
+  of JFloat:
+    result = newJFloat(fieldPair.val.tryParseBiggestFloat(0).val)
+  of JBool:
+    result = newJBool(fieldPair.val.tryParseBool(false).val)
+  of JNull:
+    result = newJNull()
+  else:
+    result = fieldPair.val.parseJson
+
+proc jValues*(fieldPairs: openArray[JFieldPair|JFieldItem]): seq[JsonNode] =
+  for f in fieldPairs:
+    result.add(f.jValue)
 
 proc names*(fieldsDesc: seq[JFieldDesc]): seq[string] =
   for f in fieldsDesc:
