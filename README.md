@@ -2,5 +2,5 @@
 
 #### install
 ```
-nimble install https://github.com/zendbit/nim.stdext
+nimble install stdext@#head
 ```
