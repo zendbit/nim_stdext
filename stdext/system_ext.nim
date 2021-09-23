@@ -5,7 +5,7 @@
 ##  Git: https://github.com/zendbit/nim.stdext
 ##
 
-import macros, strutils, json
+import macros, strutils, json, sequtils
 
 macro nameof*(p: typed): untyped =
   ##
@@ -18,9 +18,9 @@ macro nameof*(p: typed): untyped =
   ##  echo nameof(Users.name)
   ##
   result = newStmtList()
-  
+
   var nodeName: string = ""
-  
+
   case p.kind:
   of nnkIdent, nnkSym:
     nodeName = $p
@@ -33,10 +33,6 @@ macro nameof*(p: typed): untyped =
       case n.kind:
       of nnkIdent, nnkSym:
         nodeName = $n
-      of nnkHiddenDeref, nnkDerefExpr:
-        nodeName = $n[0][0]
-      of nnkObjConstr:
-        nodeName = $n[0]
       else:
         discard
   else:
@@ -59,7 +55,12 @@ macro fnameof*(p: typed): untyped =
   ##
   result = newStmtList()
   
+  var nodeNameTmp: seq[string] = @[]
   var nodeName: seq[string] = @[]
+
+  proc mergeNodeName() =
+    nodeNameTmp = nodeName & nodeNameTmp
+    nodeName = @[]
   
   case p.kind:
   of nnkIdent, nnkSym:
@@ -71,22 +72,40 @@ macro fnameof*(p: typed): untyped =
   of nnkObjConstr:
     nodeName.add($p[0] & "()")
   of nnkDotExpr:
-    for n in p:
-      case n.kind:
-      of nnkIdent, nnkSym:
-        nodeName.add($n)
-      of nnkHiddenDeref:
-        nodeName.add($n[0][0] & "()")
-      of nnkDerefExpr:
-        nodeName.add($n[0][0] & "()[]")
-      of nnkObjConstr:
-        nodeName.add($n[0] & "()")
-      else:
-        discard
+    var parseList = @[p]
+    while parseList.len > 0:
+      let nnkDot = parseList[0]
+      parseList.delete(0, 1)
+      for n in nnkDot:
+        case n.kind:
+        of nnkIdent, nnkSym:
+          nodeName.add($n)
+        of nnkHiddenDeref:
+          if n[0].len == 0:
+            nodeName.add($n[0])
+          else:
+            if n[0].kind == nnkDotExpr:
+              parseList.add(n[0])
+            else:
+              nodeName.add($n[0][0] & "()")
+        of nnkDerefExpr:
+          if n[0].len == 0:
+            nodeName.add($n[0])
+          else:
+            if n[0].kind == nnkDotExpr:
+              parseList.add(n[0])
+            else:
+              nodeName.add($n[0][0] & "()[]")
+        of nnkObjConstr:
+          nodeName.add($n[0])
+        else:
+          discard
+
+      mergeNodeName()
   else:
     discard
 
-  result.add(newStrLitNode(nodeName.join(".")))
+  result.add(newStrLitNode(nodeNameTmp.join(".")))
 
 template `$@`*(p: typed): untyped =
   ##
