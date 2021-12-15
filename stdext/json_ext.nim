@@ -125,11 +125,11 @@ proc fieldDesc*[T](k: string, v: T): JFieldDesc =
 proc fieldDesc*[T: object|ref object](obj: T): seq[JFieldDesc] =
   when obj is object:
     for k, v in obj.fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(k.fieldDesc(v))
   else:
     for k, v in obj[].fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(k.fieldDesc(v))
 
 proc fieldPair*[T](k: string, v: T): JFieldPair =
@@ -190,11 +190,11 @@ proc fieldPair*[T](k: string, v: T): JFieldPair =
 proc fieldPair*[T: object|ref object](obj: T): seq[JFieldPair] =
   when obj is object:
     for k, v in obj.fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(k.fieldPair(v))
   else:
     for k, v in obj[].fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(k.fieldPair(v))
 
 proc fieldItem*[T](v: T): JFieldItem =
@@ -255,12 +255,12 @@ proc fieldItem*[T](v: T): JFieldItem =
 proc fieldItem*[T: object|ref object](obj: T): seq[JFieldItem] =
   when obj is object:
     for k, v in obj.fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(fieldItem(v))
   
   else:
     for k, v in obj[].fieldPairs:
-      if not v.hasCustomPragma(ignoreField):
+      when not v.hasCustomPragma(ignoreField):
         result.add(fieldItem(v))
 
 proc filter*(
