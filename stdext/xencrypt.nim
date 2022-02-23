@@ -5,8 +5,7 @@
 ##  Git: https://github.com/zendbit/nim.stdext
 ##
 
-proc xorEncodeDecode*(
-  data: string,
+proc xorEncodeDecode*(data: string,
   key: string): string =
   
   # xor encode decode the data with given key

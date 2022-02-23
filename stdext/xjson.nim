@@ -5,18 +5,37 @@
 ##  Git: https://github.com/zendbit/nim.stdext
 ##
 
-import json, options, times, macros, strutils
-export json, options, times
-import options_ext, strutils_ext
-export options_ext, strutils_ext
+import
+  json,
+  options,
+  times,
+  macros,
+  strutils
+
+export
+  json,
+  options,
+  times
+
+import
+  xoptions,
+  xstrutils
+
+export
+  xoptions,
+  xstrutils
 
 # ignore field on fieldsItem, fieldsDesc, fieldsPair
 template ignoreField*() {.pragma.}
 
 type
-  JFieldDesc* = tuple[name: string, nodeKind: JsonNodeKind]
-  JFieldItem* = tuple[val: string, nodeKind: JsonNodeKind]
-  JFieldPair* = tuple[name: string, val: string, nodeKind: JsonNodeKind]
+  JFieldDesc* = tuple[name: string,
+    nodeKind: JsonNodeKind]
+  JFieldItem* = tuple[val: string,
+    nodeKind: JsonNodeKind]
+  JFieldPair* = tuple[name: string,
+    val: string,
+    nodeKind: JsonNodeKind]
 
 proc `%`*(dt: DateTime): JsonNode =
 
@@ -32,15 +51,19 @@ proc `%`*(c: char): JsonNode =
 
 proc `%`*(fieldDesc: JFieldDesc): JsonNode =
  
-  result = %*{"name": fieldDesc.name, "nodeKind": fieldDesc.nodeKind}
+  result = %*{"name": fieldDesc.name,
+    "nodeKind": fieldDesc.nodeKind}
 
 proc `%`*(fieldItem: JFieldItem): JsonNode =
  
-  result = %*{"val": fieldItem.val, "nodeKind": fieldItem.nodeKind}
+  result = %*{"val": fieldItem.val,
+    "nodeKind": fieldItem.nodeKind}
 
 proc `%`*(fieldPair: JFieldPair): JsonNode =
  
-  result = %*{"name": fieldPair.name, "val": fieldPair.val, "nodeKind": fieldPair.nodeKind}
+  result = %*{"name": fieldPair.name,
+    "val": fieldPair.val,
+    "nodeKind": fieldPair.nodeKind}
 
 proc jValue*(fieldPair: JFieldPair|JFieldItem): JsonNode =
   case fieldPair.nodeKind

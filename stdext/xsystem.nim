@@ -5,7 +5,11 @@
 ##  Git: https://github.com/zendbit/nim.stdext
 ##
 
-import macros, strutils, json, sequtils
+import
+  macros,
+  strutils,
+  json,
+  sequtils
 
 macro nameof*(p: typed): untyped =
   ##

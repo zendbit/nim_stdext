@@ -6,7 +6,7 @@
 ##
 
 import
-  strutils,
+  std/strutils,
   nre,
   strformat
 

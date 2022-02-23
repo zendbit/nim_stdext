@@ -1,5 +1,5 @@
 # Package
-version     = "0.0.12"
+version     = "0.0.13"
 author      = "Amru Rosyada"
 description = "Extended library for nim stdlib"
 license     = "BSD"
