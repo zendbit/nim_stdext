@@ -235,3 +235,7 @@ proc toCamelcase*(s: string): string =
 
 proc toSnakeCase*(s: string): string =
   s.replace(re "[A-Z]", proc (s: string): string = &"_{s.toLower}")
+
+proc toString*(arr: openArray[byte]): string =
+  for ch in arr:
+    result.add(ch.chr)
