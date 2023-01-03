@@ -10,7 +10,9 @@ import
   options,
   times,
   macros,
-  strutils
+  strutils,
+  strformat,
+  re
 
 export
   json,
@@ -302,7 +304,8 @@ proc filter*(
       if p(v):
         result.add(v)
   else:
-    raise newException(ValueError, "invalid parameter should be JObject or JArray")
+    if p(j):
+      result = j
 
 proc map*(
   j: JsonNode,
@@ -318,20 +321,156 @@ proc map*(
     for v in j:
       result.add(p(v))
   else:
-    raise newException(ValueError, "invalid parameter should be JObject or JArray")
-
-proc discardNull*(j: JsonNode): JsonNode =
-  case j.kind
-  of JObject:
-    return j.filter(proc (x: JsonNode): bool = x{"val"}.kind != JNull)
-  of JArray:
-    return j.filter(proc (x: JsonNode): bool = x.kind != JNull)
-  else:
-    raise newException(ValueError, "invalid parameter should be JObject or JArray")
+    result = p(j)
 
 proc delete*(
   node: var JsonNode,
   keys: varargs[string]) =
+  ##
+  ##  remove node by key
+  ##
   for k in keys:
     node.delete(k)
 
+proc modify*(j: JsonNode, replaceKeys: seq[tuple[oldKey: string, newKey: string]], ignoreKeys: seq[string] = @[], ignorePairs: seq[tuple[key: string, val: JsonNode]] = @[], nested: bool = false): JsonNode =
+  ##
+  ##  modify JsonObject with some enhancement
+  ##  - replaceKeys
+  ##  - ignoreKeys
+  ##  - ignorePairs
+  ##  if nested true will evaluate all inside the object
+  ##
+  result = j
+
+  if ignoreKeys.len > 0:
+    case result.kind
+    of JObject:
+      for k, v in result.deepCopy:
+        for key in ignoreKeys:
+          if k == key:
+            result.delete(key)
+
+        if nested:
+          case v.kind
+          of JObject:
+            result{k} = modify(v, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested)
+
+          of JArray:
+            var jArray: seq[JsonNode]
+            for jObj in v:
+              case jObj.kind
+              of JObject:
+                jArray.add(modify(jobj, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested))
+
+              of JArray:
+                for jObj_1 in jObj:
+                  jArray.add(modify(jobj, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested))
+
+              else:
+                discard
+
+            result{k} = %jArray
+
+          else:
+            discard
+
+    of JArray:
+      var jArray: seq[JsonNode] = @[]
+      for jObj in result:
+        jArray.add(modify(jObj, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested))
+
+      result = %jArray
+
+    else:
+      discard
+
+  if ignorePairs.len > 0:
+    if nested:
+      var buffJson = ""
+      buffJson.toUgly(result)
+      for pair in ignorePairs:
+        buffJson = buffJson.replace(re &""""{pair.key}":{pair.val},|,"{pair.key}":{pair.val}|"{pair.key}":{pair.val}""", "")
+      result = buffJson.parseJson
+
+    else:
+      case result.kind
+      of JObject:
+        for pair in ignorePairs:
+          if not result{pair.key}.isNil and pair.val == result{pair.key}:
+            result.delete(pair.key)
+
+      of JArray:
+        var jArray: seq[JsonNode] = @[]
+        for jObj in result:
+          jArray.add(modify(jObj, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested))
+
+        result = %jArray
+
+      else:
+        discard
+
+  if replaceKeys.len > 0:
+    if nested:
+      var buffJson = ""
+      buffJson.toUgly(result)
+      for key in replaceKeys:
+        buffJson = buffJson.replace(&"\"{key.oldKey}\":", &"\"{key.newKey}\":")
+      result = buffJson.parseJson
+    else:
+      case result.kind
+      of JObject:
+        for key in replaceKeys:
+          if not result{key.oldKey}.isNil:
+            let buffJson = result{key.oldKey}
+            result.delete(key.oldKey)
+            result{key.newKey} = buffJson
+
+      of JArray:
+        var jArray: seq[JsonNode] = @[]
+        for jObj in result:
+          jArray.add(modify(jObj, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested))
+
+        result = %jArray
+
+      else:
+        discard
+
+proc toJson*[T](t: T, replaceKeys: seq[tuple[oldKey: string, newKey: string]] = @[], ignoreKeys: seq[string] = @[], ignorePairs: seq[tuple[key: string, val: JsonNode]] = @[], nested: bool = false): JsonNode =
+  ##
+  ##  replace key value with specific key value pairs
+  ##  if nestedReplace true will evaluate all inside the object
+  ##
+  result = modify(%t, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested)
+
+proc toObject*[T](j: JsonNode, t: typedesc[T], replaceKeys: seq[tuple[oldKey: string, newKey: string]], ignoreKeys: seq[string] = @[], ignorePairs: seq[tuple[key: string, val: JsonNode]] = @[], nested: bool = false): T =
+  ##
+  ##  replace key value with specific key value pairs
+  ##  if nestedReplace true will evaluate all inside the object
+  ##
+  result = modify(j, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested).to(t)
+
+proc discardNull*(j: JsonNode, nested: bool = false): JsonNode =
+  ##
+  ##  discard null value in the object (remove key with null value)
+  ##  if nested true, will evaluated in all value inside the key
+  ##
+  result = j
+  if nested:
+    var buffJson = ""
+    buffJson.toUgly(j)
+    result = buffJson.replace(re""""[^"]+":null,|,"[^"]+":null|"[^"]+":null""", "").parseJson
+  else:
+    case j.kind
+    of JObject:
+      for k, v in j:
+        if v.kind == JNull: result.delete(k)
+
+    of JArray:
+      var jArray: seq[JsonNode] = @[]
+      for jObj in jArray:
+        jarray.add(jObj.discardNull(nested = nested))
+
+      result = %jArray
+
+    else:
+      discard
