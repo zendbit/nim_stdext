@@ -419,7 +419,7 @@ proc toJson*[T](t: T, replaceKeys: seq[tuple[oldKey: string, newKey: string]] = 
   ##
   result = modify(%t, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested)
 
-proc toObject*[T](j: JsonNode, t: typedesc[T], replaceKeys: seq[tuple[oldKey: string, newKey: string]], ignoreKeys: seq[string] = @[], ignorePairs: seq[tuple[key: string, val: JsonNode]] = @[], nested: bool = false): T =
+proc toObject*[T](j: JsonNode, t: typedesc[T], replaceKeys: seq[tuple[oldKey: string, newKey: string]] = @[], ignoreKeys: seq[string] = @[], ignorePairs: seq[tuple[key: string, val: JsonNode]] = @[], nested: bool = false): T =
   ##
   ##  replace key value with specific key value pairs
   ##  if nestedReplace true will evaluate all inside the object
