@@ -11,8 +11,7 @@ import
   times,
   macros,
   strutils,
-  strformat,
-  re
+  strformat
 
 export
   json,
