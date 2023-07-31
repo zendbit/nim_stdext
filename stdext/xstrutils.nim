@@ -52,7 +52,7 @@ proc tryParseUInt*(
 
 proc tryParseBiggestInt*(
   str: string,
-  default: int64 = 0): tuple[ok: bool, val: int64] =
+  default: BiggestInt = 0): tuple[ok: bool, val: BiggestInt] =
 
   #
   # parse string 
@@ -71,7 +71,7 @@ proc tryParseBiggestInt*(
 
 proc tryParseBiggestUInt*(
   str: string,
-  default: uint64 = 0): tuple[ok: bool, val: uint64] =
+  default: BiggestUInt = 0): tuple[ok: bool, val: BiggestUInt] =
   #
   # parse string 
   # let parse = "12".tryParseBiggestUInt(-1)
