@@ -425,7 +425,7 @@ proc toObject*[T](j: JsonNode, t: typedesc[T], replaceKeys: seq[tuple[oldKey: st
   ##
   result = modify(j, replaceKeys = replaceKeys, ignoreKeys = ignoreKeys, ignorePairs = ignorePairs, nested = nested).to(t)
 
-proc discardNull*(j: JsonNode, nested: bool = false): JsonNode =
+proc discardNull*(j: JsonNode, nested: bool = false, discardEmpty: bool = false): JsonNode =
   ##
   ##  discard null value in the object (remove key with null value)
   ##  if nested true, will evaluated in all value inside the key
@@ -438,6 +438,19 @@ proc discardNull*(j: JsonNode, nested: bool = false): JsonNode =
       if v.kind == JNull:
         result.delete(k)
         continue
+
+      if discardEmpty:
+        if v.kind == JFloat and v.getFloat() == 0:
+          result.delete(k)
+          continue
+
+        if v.kind == JInt and v.getInt() == 0:
+          result.delete(k)
+          continue
+
+        if v.kind == JString and v.getStr().strip() == "":
+          result.delete(k)
+          continue
 
       if nested:
         case v.kind
