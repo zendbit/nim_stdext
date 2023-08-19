@@ -230,11 +230,21 @@ proc tryParseEnum*[T](
   except:
     result = (false, default)
 
-proc toCamelcase*(s: string): string =
-  return s.replace(re "_([a-z])", proc (m: RegexMatch2, s: string): string = s.toUpper()).replace("_", "")
+proc toCamelCase(m: RegexMatch2, s: string): string =
+  if m.captures.len != 0:
+    result = s[m.group(0)].toUpper().replace("_", "")
+
+proc toSnakeCase(m: RegexMatch2, s: string): string =
+  if m.captures.len != 0:
+    result = &"_{s[m.group(0)].toLower()}"
+
+proc toCamelCase*(s: string): string =
+  return s.replace(re2 "(_[a-z])", toCamelCase)
 
 proc toSnakeCase*(s: string): string =
-  s.replace(re "[A-Z]", proc (m: RegexMatch2, s: string): string = &"_{s.toLower()}")
+  result = s.replace(re2 "([A-Z])", toSnakeCase)
+  if result.startsWith("_"):
+    result = result.subStr(1, high(result))
 
 proc toString*(arr: openArray[byte]): string =
   for ch in arr:
