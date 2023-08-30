@@ -1,5 +1,5 @@
 # Package
-version     = "0.2.2"
+version     = "0.2.3"
 author      = "Amru Rosyada"
 description = "Extended library for nim stdlib"
 license     = "BSD"
@@ -7,5 +7,3 @@ license     = "BSD"
 # Deps
 requires "nim >= 1.0.0"
 requires "regex >= 0.20.2"
-
-srcDir = "stdext"
